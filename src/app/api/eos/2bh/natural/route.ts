@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 // JS modules are fine to import in TS routes in Next.js
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { getNaturalColor } from '../../../../../services/eos/imagery.js'
+import { getNaturalColor } from '../../../../../../services/eos/imagery.js'
 
 // 2BH center coordinates
 const CENTER = { lat: 0.5143, lng: 35.2698 }
