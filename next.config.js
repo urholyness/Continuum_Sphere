@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Force static export - no SSR
-  trailingSlash: true,
+  output: 'standalone', // Force static export - no SSR
   images: {
     unoptimized: true
   },
