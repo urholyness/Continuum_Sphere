@@ -67,8 +67,8 @@ const REAL_FARMS: Farm[] = [
     name: "2 Butterflies Homestead",
     region: "Uasin Gishu",
     country: "KE",
-    latitude: 0.5143,      // Real coordinates from DynamoDB
-    longitude: 35.2698,    // Real coordinates from DynamoDB
+    latitude: 0.434369,      // Corrected GPS coordinates
+    longitude: 35.168873,    // Corrected GPS coordinates
     altitudeM: 2100,       // Real elevation
     acreageHa: 3.64,       // Real acreage (9 acres = 3.64 hectares)
     soilType: "Loam",
@@ -144,6 +144,37 @@ export default function AdminDashboardLCARS() {
   // Form state for current farm
   const [form, setForm] = useState<Farm>(() => sel || emptyFarm());
   useEffect(() => { setForm(sel || emptyFarm()); }, [selected]);
+
+  // Admin API wiring: load and save
+  async function loadFromAPI(){
+    try{
+      const res = await fetch('/api/admin/farms', { cache: 'no-store' })
+      if(!res.ok) throw new Error('load failed')
+      const j = await res.json()
+      if(Array.isArray(j.items)){
+        const mapped: Farm[] = j.items.map((it:any)=>({
+          id: String(it.id || '').toUpperCase(),
+          name: it.name || 'Unnamed',
+          region: 'Unknown', country: 'KE',
+          latitude: Number(it.lat ?? 0), longitude: Number(it.lng ?? 0),
+          altitudeM: 0, acreageHa: 1, soilType: 'Loam', irrigation: 'Mixed', mechanization: 'Hybrid', waterSource: '',
+          certifications: ['None'], contact: '', notes: '', sensors: [], cropPlan: []
+        }))
+        if(mapped.length){ setFarms(mapped); setSelected(0) }
+      }
+    }catch(e){ console.error(e) }
+  }
+
+  async function saveCurrentToAPI(){
+    try{
+      const f = farms[selected]; if(!f) return
+      const res = await fetch('/api/admin/farms', {
+        method: 'POST', headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ id: f.id, name: f.name, lat: f.latitude, lng: f.longitude })
+      })
+      if(!res.ok) throw new Error('save failed')
+    }catch(e){ console.error(e) }
+  }
 
   function emptyFarm(): Farm {
     return {
@@ -379,6 +410,8 @@ export default function AdminDashboardLCARS() {
               {/* Import / Export */}
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Button onClick={downloadJSON} className="rounded-xl bg-emerald-500 hover:bg-emerald-400"><Download className="h-4 w-4 mr-1"/>Export JSON</Button>
+                <Button variant="secondary" className="rounded-xl bg-white/10 hover:bg-white/20 border border-white/15" onClick={loadFromAPI}>Load from API</Button>
+                <Button variant="secondary" className="rounded-xl bg-white/10 hover:bg-white/20 border border-white/15" onClick={saveCurrentToAPI}>Save current to API</Button>
                 <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/15 hover:bg-white/20 cursor-pointer">
                   <Upload className="h-4 w-4"/> Import JSON
                   <input type="file" accept="application/json" className="hidden" onChange={importJSON}/>
