@@ -75,7 +75,7 @@ const REAL_FARMS: Farm[] = [
     irrigation: "Drip",
     mechanization: "Hybrid",
     waterSource: "Rain + Borehole",
-    certifications: ["GlobalGAP", "KEPHIS"],
+    certifications: ["GlobalG.A.P", "KEPHIS"],
     contact: "Vio — +2547•••",
     notes: "Real farm - French Beans production",
     sensors: [
